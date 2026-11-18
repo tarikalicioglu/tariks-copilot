@@ -341,9 +341,9 @@ function settingsHtml(){const s=S.set;return `<h1 class="gt">Ayarlar</h1>
 <div class="row" style="margin-top:10px"><button class="btn gold s" data-act="copybk">${ic('copy',16)} Yedeği kopyala</button><button class="btn s" data-act="pastebk">Yedeği yapıştır</button></div>
 <div class="dh gt">Etkinlikler</div><div class="xs mu">${EV.updated?'Son güncelleme '+dfmt(EV.updated)+' · '+EV.events.length+' etkinlik':'Henüz yok'}</div>
 <div class="row" style="margin-top:16px"><button class="btn red s" data-act="wipe" id="wipe">Tüm veriyi sil</button><span class="sp"></span><button class="btn gold" data-act="close">Tamam</button></div>`}
-function exportData(){return JSON.stringify({app:'sofor-defteri',v:1,t:Date.now(),shifts:S.shifts,incidents:S.incidents,phrases:S.phrases,fav:S.fav,rem:S.rem,set:S.set,calc:S.calc})}
+function exportData(){const n=new Date();const hd='Copilot Yedek '+pad(n.getDate())+'.'+pad(n.getMonth()+1)+'.'+n.getFullYear()+' '+pad(n.getHours())+':'+pad(n.getMinutes());return hd+'\n\n'+JSON.stringify({app:'sofor-defteri',v:1,t:Date.now(),shifts:S.shifts,incidents:S.incidents,phrases:S.phrases,fav:S.fav,rem:S.rem,set:S.set,calc:S.calc})}
 function importData(txt){
-  let o;try{o=JSON.parse(txt.trim())}catch(e){return 'Metin okunamadı. Tamamını yapıştır.'}
+  let o;try{const a=txt.indexOf('{'),b=txt.lastIndexOf('}');o=JSON.parse(txt.slice(a,b+1))}catch(e){return 'Metin okunamadı. Tamamını yapıştır.'}
   if(!o||o.app!=='sofor-defteri')return 'Bu bir Şoför Defteri yedeği değil.';
   let n=0;const mg=(k)=>{const have=new Set(S[k].map(x=>x.id));(o[k]||[]).forEach(x=>{if(x&&x.id&&!have.has(x.id)){S[k].push(x);n++}})};
   mg('shifts');mg('incidents');mg('phrases');
