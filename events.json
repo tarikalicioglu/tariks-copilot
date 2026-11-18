@@ -1,0 +1,325 @@
+{
+ "updated": "2026-11-18",
+ "events": [
+  {
+   "id": "d1",
+   "title": "Let's Dance Live-Tour",
+   "city": "Düsseldorf",
+   "venue": "PSD Bank Dome",
+   "date": "2026-11-18",
+   "start": "19:30",
+   "end": "22:30",
+   "imp": 3,
+   "note": "Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "d2",
+   "title": "The Prodigy",
+   "city": "Düsseldorf",
+   "venue": "Mitsubishi Electric Halle",
+   "date": "2026-11-18",
+   "start": "20:00",
+   "end": "22:30",
+   "imp": 2,
+   "note": "Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "d3",
+   "title": "Andreas Gabalier unplugged",
+   "city": "Düsseldorf",
+   "venue": "Tonhalle",
+   "date": "2026-11-18",
+   "start": "20:00",
+   "end": "22:30",
+   "imp": 1,
+   "note": "Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "d4",
+   "title": "The Script",
+   "city": "Düsseldorf",
+   "venue": "Mitsubishi Electric Halle",
+   "date": "2026-11-24",
+   "start": "19:30",
+   "end": "22:30",
+   "imp": 2,
+   "note": "Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "d5",
+   "title": "Bryson Tiller",
+   "city": "Düsseldorf",
+   "venue": "Mitsubishi Electric Halle",
+   "date": "2026-11-26",
+   "start": "20:00",
+   "end": "22:30",
+   "imp": 2,
+   "note": "Başlangıç ve bitiş tahmini, doğrula",
+   "est": true
+  },
+  {
+   "id": "d6",
+   "title": "Ikkimel",
+   "city": "Düsseldorf",
+   "venue": "Mitsubishi Electric Halle",
+   "date": "2026-11-27",
+   "start": "20:00",
+   "end": "22:30",
+   "imp": 2,
+   "note": "Başlangıç ve bitiş tahmini, doğrula",
+   "est": true
+  },
+  {
+   "id": "d7",
+   "title": "First Aid Kit",
+   "city": "Düsseldorf",
+   "venue": "Tonhalle",
+   "date": "2026-11-27",
+   "start": "20:00",
+   "end": "22:15",
+   "imp": 1,
+   "note": "Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "d8",
+   "title": "BAP Fünfzig Jahre Tour",
+   "city": "Düsseldorf",
+   "venue": "PSD Bank Dome",
+   "date": "2026-11-28",
+   "start": "19:30",
+   "end": "22:45",
+   "imp": 3,
+   "note": "Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "d9",
+   "title": "Fortuna Düsseldorf - Großaspach",
+   "city": "Düsseldorf",
+   "venue": "Merkur Spiel-Arena",
+   "date": "2026-11-21",
+   "start": "14:00",
+   "end": "15:55",
+   "imp": 2,
+   "note": "3. Liga maçı",
+   "est": true
+  },
+  {
+   "id": "g1",
+   "title": "Schalke 04 - VfB Stuttgart",
+   "city": "Gelsenkirchen",
+   "venue": "Veltins-Arena",
+   "date": "2026-11-21",
+   "start": "18:30",
+   "end": "20:25",
+   "imp": 3,
+   "note": "Bundesliga, Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "b1",
+   "title": "VfL Bochum - Darmstadt 98",
+   "city": "Bochum",
+   "venue": "Vonovia Ruhrstadion",
+   "date": "2026-11-27",
+   "start": "17:30",
+   "end": "19:25",
+   "imp": 3,
+   "note": "2. Bundesliga, Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "u1",
+   "title": "MSV Duisburg - Hansa Rostock",
+   "city": "Duisburg",
+   "venue": "Schauinsland-Reisen-Arena",
+   "date": "2026-11-22",
+   "start": "19:30",
+   "end": "21:25",
+   "imp": 3,
+   "note": "3. Liga, Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "u2",
+   "title": "3. Philharmonisches Konzert",
+   "city": "Duisburg",
+   "venue": "Mercatorhalle",
+   "date": "2026-11-25",
+   "start": "20:00",
+   "end": "22:00",
+   "imp": 1,
+   "note": "Bitiş tahmini",
+   "est": true
+  },
+  {
+   "id": "u3",
+   "title": "Reinhold Messner",
+   "city": "Duisburg",
+   "venue": "Rheinhausen-Halle",
+   "date": "2026-11-27",
+   "start": "20:00",
+   "end": "22:15",
+   "imp": 1,
+   "note": "Başlangıç ve bitiş tahmini, doğrula",
+   "est": true
+  },
+  {
+   "id": "e1",
+   "title": "257ers",
+   "city": "Essen",
+   "venue": "Zeche Carl",
+   "date": "2026-11-26",
+   "start": "20:00",
+   "end": "23:00",
+   "imp": 1,
+   "note": "Başlangıç ve bitiş tahmini, doğrula",
+   "est": true
+  },
+  {
+   "id": "m1",
+   "title": "MEDICA (Fachmesse)",
+   "city": "Düsseldorf",
+   "venue": "Messe Düsseldorf",
+   "date": "2026-11-16",
+   "to": "2026-11-19",
+   "start": "10:00",
+   "end": "18:00",
+   "imp": 3,
+   "note": "19.11'de 16:00'da kapanır. Sadece iş dünyası ziyaretçisi.",
+   "est": false
+  },
+  {
+   "id": "m2",
+   "title": "Essen Motor Show",
+   "city": "Essen",
+   "venue": "Messe Essen",
+   "date": "2026-11-28",
+   "to": "2026-12-06",
+   "start": "10:00",
+   "end": "18:00",
+   "imp": 3,
+   "note": "Saatler tahmini, doğrula. 27.11 Preview Day.",
+   "est": true
+  },
+  {
+   "id": "m3",
+   "title": "VALVE WORLD EXPO (Fachmesse)",
+   "city": "Düsseldorf",
+   "venue": "Messe Düsseldorf",
+   "date": "2026-12-01",
+   "to": "2026-12-03",
+   "start": "09:00",
+   "end": "17:00",
+   "imp": 2,
+   "note": "Saatler tahmini, doğrula.",
+   "est": true
+  },
+  {
+   "id": "m4",
+   "title": "Düsseldorfer Weihnachtsmarkt",
+   "city": "Düsseldorf",
+   "venue": "Rathaus / Marktplatz",
+   "date": "2026-11-19",
+   "to": "2026-12-30",
+   "start": "11:00",
+   "end": "21:00",
+   "imp": 3,
+   "note": "Saatler tahmini. 22.11 kapalı (Totensonntag). Birkaç meydana yayılır.",
+   "est": true
+  },
+  {
+   "id": "m5",
+   "title": "Ratinger Weihnachtsmarkt",
+   "city": "Ratingen",
+   "venue": "Marktplatz Altstadt",
+   "date": "2026-11-21",
+   "to": "2026-12-22",
+   "start": "11:00",
+   "end": "21:00",
+   "imp": 2,
+   "note": "Kaynak Totensonntag için farklı saat veriyor, doğrula.",
+   "est": false
+  },
+  {
+   "id": "m6",
+   "title": "Nostalgischer Weihnachtsmarkt",
+   "city": "Hattingen",
+   "venue": "St.-Georgs-Kirche",
+   "date": "2026-11-23",
+   "to": "2026-12-22",
+   "start": "12:00",
+   "end": "21:00",
+   "imp": 2,
+   "note": "Kaynak açılış gününde tutarsız, doğrula.",
+   "est": false
+  }
+ ],
+ "venues": {
+  "PSD Bank Dome": {
+   "addr": "PSD Bank Dome, Theodorstraße 281, 40472 Düsseldorf",
+   "pid": "ChIJLVtRq6vJuEcRyAPSLNNEvWI"
+  },
+  "Mitsubishi Electric Halle": {
+   "addr": "Mitsubishi Electric Halle, Siegburger Str. 15, 40591 Düsseldorf",
+   "pid": "ChIJS-pf0LDLuEcRVONnxqof240"
+  },
+  "Tonhalle": {
+   "addr": "Tonhalle Düsseldorf, Ehrenhof 1, 40479 Düsseldorf",
+   "pid": "ChIJB_UtKhzKuEcRAOWGGhA5weU"
+  },
+  "Merkur Spiel-Arena": {
+   "addr": "Merkur Spiel-Arena, Arena-Straße 1, 40474 Düsseldorf",
+   "pid": "ChIJXZtRoD-2uEcRhAFr67KQ2j4"
+  },
+  "Veltins-Arena": {
+   "addr": "Veltins-Arena, Rudi-Assauer-Platz 1, 45891 Gelsenkirchen",
+   "pid": "ChIJCVD2HArmuEcRcr_9ZP9azt8"
+  },
+  "Vonovia Ruhrstadion": {
+   "addr": "Vonovia Ruhrstadion, Castroper Str. 145, 44791 Bochum",
+   "pid": "ChIJcz_-tCXguEcRVTCztObSgjE"
+  },
+  "Schauinsland-Reisen-Arena": {
+   "addr": "Schauinsland-Reisen-Arena, Margaretenstraße 5-7, 47055 Duisburg",
+   "pid": "ChIJJUECKky_uEcRZ6IqXw5F3ts"
+  },
+  "Mercatorhalle": {
+   "addr": "Mercatorhalle, Landfermannstraße 6, 47051 Duisburg",
+   "pid": "ChIJUUNNNRK_uEcReFfy1rbkhBc"
+  },
+  "Rheinhausen-Halle": {
+   "addr": "Rheinhausen-Halle, Beethovenstraße 20, 47226 Duisburg",
+   "pid": "ChIJy3YSZEq5uEcRE92RaFM7klY"
+  },
+  "Zeche Carl": {
+   "addr": "Zeche Carl, Wilhelm-Nieswandt-Allee 100, 45326 Essen",
+   "pid": "ChIJRWfgvmzouEcRxxSfvxeW3QE"
+  },
+  "Messe Düsseldorf": {
+   "addr": "Messe Düsseldorf, Stockumer Kirchstraße 61, 40474 Düsseldorf",
+   "pid": "ChIJ7xLIlRe2uEcRvU8BOmpYyKE"
+  },
+  "Messe Essen": {
+   "addr": "Messe Essen, Messeplatz 1, 45131 Essen",
+   "pid": "ChIJOy5gRSbDuEcRJ1rKKuvEm8w"
+  },
+  "Rathaus / Marktplatz": {
+   "addr": "Rathaus Düsseldorf, Marktplatz 2, 40213 Düsseldorf",
+   "pid": "ChIJbbjulBnKuEcRDdhLqFnbb_A"
+  },
+  "Marktplatz Altstadt": {
+   "addr": "Marktplatz 9, 40878 Ratingen",
+   "pid": "ChIJzb9h72jJuEcRnPaUrOkx25c"
+  },
+  "St.-Georgs-Kirche": {
+   "addr": "St.-Georgs-Kirche, Kirchplatz 19, 45525 Hattingen",
+   "pid": "ChIJNZYWVR3fuEcRUAFXBr-ZRe8"
+  }
+ }
+}
