@@ -156,8 +156,8 @@ function vAna(){
       h+=`<div class="cd gc ev"><div class="t"><div class="city gt">${esc(e.city)}</div><div class="n">${esc(e.title)}</div><div class="sm ${near?'gt':'mu'}">bitiş ${e.est?'~':''}${esc(e.end||'?')} · ${near?'ŞİMDİ: ':''}${hm(left)} kaldı</div></div>${mapBtn(e)}</div>`})}
   h+=`<div class="cd"><div class="row"><b>Gün özetini anlat</b><span class="sp"></span>${DICT?`<button class="coin" data-act="mic" aria-label="Konuş">${ic('mic')}</button>`:''}</div>
     <textarea class="in" id="aitxt" placeholder="Örn: bugün 7-15 arası çalıştım, 45 dk mola, ciro 168, bahşiş 12, 140 km, şarj 14 euro" style="margin-top:8px">${esc(ui.aiText)}</textarea>
-    <div class="row" style="margin-top:10px"><button class="btn gold s" data-act="aiparse" ${AI?'':'disabled'}>${ic('wand',16)} Anlat → Kaydet</button><button class="btn s" data-act="newshift">${ic('plus',16)} Elle gir</button></div>
-    <div class="xs mu" style="margin-top:8px">${AI?'Klavyedeki mikrofonla da konuşabilirsin.':'Yapay zeka bu kopyada yok. Klavyedeki mikrofonla yaz, "Elle gir" ile kaydet.'}</div></div>`;
+    <div class="row" style="margin-top:10px"><button class="btn gold s" data-act="aiparse">${ic('wand',16)} Anlat → Kaydet</button><button class="btn s" data-act="newshift">${ic('plus',16)} Elle gir</button></div>
+    <div class="xs mu" style="margin-top:8px">Klavyedeki mikrofonla konuşabilirsin. ${AI?'Yapay zeka anlar.':'Kural tabanlı çalışır: "7\'den 15\'e, ciro 168, bahşiş 12, 140 km, 45 dk mola".'}</div></div>`;
   h+=`<div class="cd"><div class="xs mu">Bu ay</div><div class="row" style="margin-top:4px"><b>${num(mm/60)} sa</b><b>${eur(mr,0)}</b><b class="gt">${num(mm>0?mr/(mm/60):0)} €/sa</b></div></div>`;
   h+=`<div class="cd"><b>Yedek</b><div class="xs mu" style="margin-top:2px">Verini kopyala, diğer kopyada yapıştır.</div><div class="row" style="margin-top:10px"><button class="btn gold s" data-act="copybk">${ic('copy',16)} Yedeği kopyala</button><button class="btn s" data-act="pastebk">Yedeği yapıştır</button></div></div>`;
   return h;
@@ -353,22 +353,117 @@ function importData(txt){
 function sheet(html){$('#layer').innerHTML=`<div class="shade" data-act="shade"><div class="sheet">${html}</div></div>`}
 const closeSheet=()=>{$('#layer').innerHTML=''};
 
+const NW={'sıfır':0,bir:1,iki:2,'üç':3,'dört':4,'beş':5,'altı':6,yedi:7,sekiz:8,dokuz:9,on:10,yirmi:20,otuz:30,'kırk':40,elli:50,'altmış':60,'yetmiş':70,seksen:80,doksan:90};
+const isSp=x=>/^\s+$/.test(x);
+function numWords(t){
+  const toks=t.split(/(\s+)/),out=[];let i=0;
+  const isNW=w=>w&&!isSp(w)&&((w in NW)||w==='yüz'||w==='bin'||w==='buçuk'||w==='yarım');
+  while(i<toks.length){
+    if(isNW(toks[i])){
+      let total=0,cur=0,half=0,j=i,last=i;
+      while(j<toks.length){const x=toks[j];
+        if(isSp(x)){j++;continue}
+        if(x in NW){cur+=NW[x];last=j}
+        else if(x==='yüz'){cur=(cur||1)*100;last=j}
+        else if(x==='bin'){total+=(cur||1)*1000;cur=0;last=j}
+        else if(x==='buçuk'||x==='yarım'){half=.5;last=j}
+        else break;
+        j++}
+      out.push(String(total+cur+half));i=last+1;
+    }else{out.push(toks[i]);i++}
+  }
+  return out.join('');
+}
+function ruleParse(text,now){
+  now=now||new Date();
+  let t=String(text).toLocaleLowerCase('tr').replace(/[’‘`´']/g,'').replace(/(\d),(\d)/g,'$1.$2').replace(/([;!?,])/g,' $1 ').replace(/\.(?=\s|$)/g,' ');
+  t=numWords(t);
+  const orig=String(text).trim(),r={},miss=[];
+  const mk=(re)=>{const m=re.exec(t);if(m){t=t.slice(0,m.index)+' '.repeat(m[0].length)+t.slice(m.index+m[0].length)}return m};
+  const P=n=>String(n).padStart(2,'0');
+  /* date */
+  let off=null;
+  const MON=['ocak','şubat','mart','nisan','mayıs','haziran','temmuz','ağustos','eylül','ekim','kasım','aralık'];
+  let m=mk(new RegExp('(\\d{1,2})\\s*('+MON.join('|')+')'));
+  let date=null;
+  if(m){date=now.getFullYear()+'-'+P(MON.indexOf(m[2])+1)+'-'+P(+m[1])}
+  else if((m=mk(/evvelki gün|önceki gün|evvelsi/)))off=-2;
+  else if((m=mk(/(?<![a-zçğıöşü])dün/)))off=-1;
+  else if((m=mk(/bugün/)))off=0;
+  else{const WD=['pazar','pazartesi','salı','çarşamba','perşembe','cuma','cumartesi'];
+    m=mk(/(pazartesi|cumartesi|pazar|salı|çarşamba|perşembe|cuma)/);if(m){const w=WD.indexOf(m[1]);off=-(((now.getDay()-w)%7)+7)%7}}
+  if(date==null){const d=new Date(now);d.setDate(d.getDate()+(off||0));date=d.getFullYear()+'-'+P(d.getMonth()+1)+'-'+P(d.getDate())}
+  r.date=date;
+  /* time */
+  const hm=(h,mi)=>P(+h)+':'+P(+(mi||0));
+  let s=null,e=null;
+  if((m=mk(/(\d{1,2})[:.](\d{2})\s*[-–—]\s*(\d{1,2})[:.](\d{2})/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
+  else if((m=mk(/(\d{1,2})(?::(\d{2}))?\s*(?:den|dan|ten|tan)\s*(\d{1,2})(?::(\d{2}))?\s*(?:e|a|ye|ya|kadar|arası|arasi)?(?![a-zçğıöşü])/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
+  else if((m=mk(/(\d{1,2})(?::(\d{2}))?\s*[-–—]\s*(\d{1,2})(?::(\d{2}))?\s*(?:arası|arasi)/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
+  else if((m=mk(/sabah\s*(?:saat\s*)?(\d{1,2})(?::(\d{2}))?.{0,30}?(?:akşam|aksam|öğleden sonra|ogleden sonra)\s*(?:saat\s*)?(\d{1,2})(?::(\d{2}))?/))){s=hm(m[1],m[2]);e=hm(+m[3]<12?+m[3]+12:m[3],m[4])}
+  else{
+    let a=mk(/(\d{1,2})(?::(\d{2}))?\s*(?:de|da|te|ta)\s*başla\S*/),b=mk(/(\d{1,2})(?::(\d{2}))?\s*(?:de|da|te|ta)\s*(?:bitir|bit|çık)\S*/);
+    if(a)s=hm(a[1],a[2]);if(b)e=hm(b[1],b[2]);
+    if(!s&&(a=mk(/başlangıç\s*(?:saat\s*)?(\d{1,2})(?::(\d{2}))?/)))s=hm(a[1],a[2]);
+    if(!e&&(b=mk(/bitiş\s*(?:saat\s*)?(\d{1,2})(?::(\d{2}))?/)))e=hm(b[1],b[2]);
+  }
+  if(s&&e){const sh=+s.slice(0,2),eh=+e.slice(0,2);if(eh<sh&&eh<=12&&sh<12){e=hm(eh+12,e.slice(3))}}
+  if(s)r.start=s;if(e)r.end=e;
+  /* break */
+  const U=u=>(u==='saat'||u==='sa')?60:1;
+  if((m=mk(/(\d+(?:\.\d+)?)\s*(dk|dak|dakika|saat|sa)?\s*(?:mola|ara verdim)/)))r.brk=Math.round(+m[1]*U(m[2]));
+  else if((m=mk(/mola[^\d]{0,12}?(\d+(?:\.\d+)?)\s*(dk|dak|dakika|saat|sa)?/)))r.brk=Math.round(+m[1]*U(m[2]));
+  /* km */
+  if((m=mk(/(\d+(?:\.\d+)?)\s*(?:km|kilometre|kilometer)/))||(m=mk(/km\s*[:=]?\s*(\d+(?:\.\d+)?)/)))r.km=+m[1];
+  /* money */
+  const L='(?<![a-zçğıöşü])';
+  const KW={rev:L+'(?:ciro|kazan\\S*|uber|hasılat|gelir)',tips:L+'(?:bahşiş|bahsis|tips?)',cash:L+'(?:nakit|cash|elden)',charge:L+'(?:şarj|sarj|yakıt|akaryakıt|benzin|supercharger)',other:L+'(?:otopark|yıkama|yikama|köprü|otoyol|gider|masraf)'};
+  const hits=[];for(const k in KW){const re=new RegExp(KW[k],'g');let x;while((x=re.exec(t)))hits.push({k,pos:x.index,end:x.index+x[0].length})}
+  hits.sort((a,b)=>a.pos-b.pos);
+  const nums=[];{const re=/\d+(?:\.\d+)?/g;let x;while((x=re.exec(t)))nums.push({v:+x[0],pos:x.index,end:x.index+x[0].length,used:false})}
+  const style=(nums.length&&hits.length&&nums[0].pos<hits[0].pos)?'before':'after';
+  const between=(a,b,self)=>hits.some(h=>h!==self&&h.pos>=a&&h.pos<b);
+  const findAfter=h=>nums.find(n=>!n.used&&n.pos>=h.end&&n.pos-h.end<=18&&!between(h.end,n.pos,h));
+  const findBefore=h=>{let c=null;nums.forEach(n=>{if(!n.used&&n.end<=h.pos&&h.pos-n.end<=14&&!between(n.end,h.pos,h))c=n});return c};
+  hits.forEach(h=>{if(r[h.k]!=null)return;const n=style==='after'?(findAfter(h)||findBefore(h)):(findBefore(h)||findAfter(h));if(n){n.used=true;r[h.k]=n.v}});
+  /* incident */
+  const inc=/(kaza|çarp\S*|hasar|çizik|göçük|şikayet|sikayet|ceza|radar|polis|arıza)/.exec(t);
+  if(inc&&!(r.start&&r.end)&&r.rev==null){
+    const c=/kaza|çarp/.test(inc[1])?'kaza':/hasar|çizik|göçük|arıza/.test(inc[1])?'hasar':/şikayet|sikayet/.test(inc[1])?'şikayet':'ceza';
+    return {type:'incident',date:r.date,cat:c,title:orig.length>48?orig.slice(0,48)+'…':orig,note:orig};
+  }
+  r.type='shift';r.note=orig;
+  ['start','end','rev'].forEach(k=>{if(r[k]==null)miss.push(k)});
+  r._miss=miss;return r;
+}
+
 /* ---------- AI ---------- */
+function showParsed(r){
+  const miss=r._miss||[];r=Object.assign({},r);delete r._miss;
+  const base=Object.assign({date:today()},clean(r));
+  if(r.type==='incident'){sheet(incForm(base));return}
+  sheet(shiftForm(base,'Kontrol et ve kaydet'));
+  const m=['start','end','rev'].filter(k=>base[k]==null||base[k]==='');
+  const nm={start:'başlangıç',end:'bitiş',rev:'ciro'};
+  m.forEach(k=>{const e=$('#f_'+k);if(e)e.style.borderColor='#E8C25A'});
+  const h=$('.sheet h1');if(h)h.insertAdjacentHTML('afterend',m.length?`<div class="xs gt" style="margin-top:4px">Bulamadım, altın çerçeveli: ${m.map(k=>nm[k]).join(', ')}. Sen doldur.</div>`:`<div class="xs mu" style="margin-top:4px">Kontrol et, sonra Kaydet.</div>`);
+}
 async function aiParse(btn){
-  const txt=(ui.aiText||'').trim();if(!txt||!AI)return;
+  const txt=(ui.aiText||'').trim();if(!txt){toast('Önce anlat veya yaz');return}
   const old=btn.innerHTML;btn.disabled=true;btn.textContent='Anlıyorum...';
-  const prompt=`Bir Uber şoförünün günlük defter asistanısın. Kullanıcı gün özetini Türkçe veya Almanca serbest metinle anlatıyor. SADECE tek bir JSON nesnesi döndür, başka metin yok.
+  let r=null;
+  if(AI){
+    const prompt=`Bir Uber şoförünün günlük defter asistanısın. Kullanıcı gün özetini Türkçe veya Almanca serbest metinle anlatıyor. SADECE tek bir JSON nesnesi döndür, başka metin yok.
 Bugün: ${today()}, saat dilimi Europe/Berlin.
-Şema: {"type":"shift"|"incident"|"note","date":"YYYY-MM-DD","start":"HH:MM","end":"HH:MM","brk":mola dakika,"rev":Uber ciro euro,"tips":bahşiş euro,"cash":nakit euro,"km":km,"charge":şarj veya yakıt gideri euro,"other":diğer gider euro,"title":"olay başlığı","cat":"kaza|hasar|şikayet|ceza|diğer","note":"kısa not"}
+Şema: {"type":"shift"|"incident","date":"YYYY-MM-DD","start":"HH:MM","end":"HH:MM","brk":mola dakika,"rev":Uber ciro euro,"tips":bahşiş euro,"cash":nakit euro,"km":km,"charge":şarj veya yakıt gideri euro,"other":diğer gider euro,"title":"olay başlığı","cat":"kaza|hasar|şikayet|ceza|diğer","note":"kısa not"}
 Kurallar: Vardiya anlatılıyorsa type=shift. Kaza, hasar, şikayet, ceza gibi olay ise type=incident. Söylenmeyen alanı null yap, uydurma. Tarih söylenmediyse bugün. "dün" = bir önceki gün. Sayıları sayı olarak ver.
 Kullanıcı metni: """${txt}"""`;
-  try{
-    const r=await AI.json(prompt);
-    if(r&&r.type==='incident')sheet(incForm(Object.assign({date:today()},clean(r))));
-    else sheet(shiftForm(Object.assign({date:today()},clean(r)),'Kontrol et ve kaydet'));
-    ui.aiText='';
-  }catch(e){toast(e&&e.code==='not_granted'?'Yapay zeka izni verilmedi':'Olmadı, tekrar dene')}
+    try{const x=await AI.json(prompt);if(x&&x.type)r=x}catch(e){r=null}
+  }
+  if(!r){try{r=ruleParse(txt)}catch(e){r=null}}
   btn.disabled=false;btn.innerHTML=old;
+  if(!r){toast('Anlayamadım, Elle gir');return}
+  ui.aiText='';showParsed(r);
 }
 function clean(r){const o={};Object.keys(r||{}).forEach(k=>{if(r[k]!==null&&r[k]!==undefined&&r[k]!=='')o[k]=r[k]});return o}
 async function aiTrans(){
