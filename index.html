@@ -32,6 +32,12 @@ h1{font-size:22px;font-weight:600;margin:0}
 .st{padding:10px}.st span{display:block;font-size:12px;color:var(--mu)}.st b{display:block;font-size:26px;font-weight:550;margin-top:2px;white-space:nowrap}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin:8px -2px 0;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
 .chip{flex:none;border:0;border-radius:20px;padding:8px 14px;font-size:13px;color:#A9B2C7;background:linear-gradient(180deg,#18223C,#0D1426);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 3px 0 #04060C}
+.chip.dc{display:flex;flex-direction:column;align-items:center;min-width:52px;padding:6px 10px;border-radius:14px;gap:0;line-height:1.1;background:linear-gradient(180deg,#2A3350,#121A30)}
+.chip.dc small{font-size:10px;text-transform:uppercase;letter-spacing:.5px;background:linear-gradient(180deg,#fff,#8E98AE);-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip.dc b{font-size:20px;font-weight:800;background:linear-gradient(180deg,#fff,#9AA4BA 60%,#C9D0E0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(0,0,0,.7))}
+.chip.dc i{font-style:normal;font-size:10px;color:#8E98AE}
+.chip.dc.z{opacity:.5}
+.chip.dc.a small,.chip.dc.a b{background:none;-webkit-background-clip:border-box;color:#2A1B02;filter:none}.chip.dc.a i{color:#4A3306}
 .chip.a{background:var(--g2);color:#2A1B02;font-weight:650;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 3px 0 #5E3F08}
 .coin{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid #3B4770;background:radial-gradient(circle at 32% 28%,#2C3654,#121828 72%);color:#E8C25A;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 4px 0 #04060C,0 8px 12px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.12)}
 .coin.on{border-color:#7A5A12;background:radial-gradient(circle at 32% 28%,#FFF6BE,#E6B945 45%,#8F6410 100%);color:#2A1B02;box-shadow:0 4px 0 #5E3F08,0 8px 12px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.8)}
@@ -282,7 +288,13 @@ function vTakvim(){
   let M=fl(EV.events.filter(e=>isM(e)&&e.to>=tdy&&e.date<lim)).sort((a,b)=>a.date.localeCompare(b.date));
   let L=fl(EV.events.filter(e=>{const d=new Date(e.date+'T12:00:00');return !isM(e)&&d>=t0&&d<t1&&evEnd(e)>new Date(Date.now()-3600000)}));
   L.sort((a,b)=>(a.date+(a.end||'')).localeCompare(b.date+(b.end||'')));
-  if(!L.length&&!M.length)h+=`<div class="cd mu">Etkinlik yok. Claude'dan güncelleme iste.</div>`;
+  let ds='<div class="chips"><button class="chip dc'+(ui.day?'':' a')+'" data-act="day" data-v=""><small>14</small><b>Hepsi</b></button>';
+  for(let i=0;i<14;i++){const d=new Date(t0.getTime()+i*86400000+43200000),k=ymd(d),n=L.filter(e=>e.date===k).length;
+    ds+=`<button class="chip dc${ui.day===k?' a':''}${n?'':' z'}" data-act="day" data-v="${k}"><small>${i?['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][d.getDay()]:'Bugün'}</small><b>${d.getDate()}</b><i>${n||'·'}</i></button>`}
+  h+=ds+'</div>';
+  if(ui.day){M=M.filter(e=>e.date<=ui.day&&e.to>=ui.day);L=L.filter(e=>e.date===ui.day);
+    if(!L.length&&!M.length)h+=`<div class="cd mu">Bu gün etkinlik yok.</div>`}
+  else if(!L.length&&!M.length)h+=`<div class="cd mu">Etkinlik yok. Claude'dan güncelleme iste.</div>`;
   if(M.length){h+=`<div class="dh sv day">Günlük süren</div>`;M.forEach(e=>{h+=evCard(e)})}
   let last='';
   L.forEach(e=>{
@@ -477,7 +489,7 @@ const act={
   'sub-kayit'(d){sub.kayit=d.v;render()},'sub-hesap'(d){sub.hesap=d.v;render()},
   'calc-reset'(){const c=curCalc();if(c){resetCalc(c);save();render()}},
   'calc-reset-all'(){Object.values(CALCS).forEach(v=>resetCalc(v[1]));resetCalc(MAAS);save();render()},
-  city(d){ui.city=d.v;render()},cat(d){ui.cat=d.v;render()},
+  city(d){ui.city=d.v;render()},day(d){ui.day=d.v;render()},cat(d){ui.cat=d.v;render()},
   start(){const ru=restUntil();if(ru>Date.now()&&!ui.restOk){ui.restOk=true;render();return}S.active={ts:Date.now(),brkMs:0,brkStart:0};ui.restOk=false;save();render()},
   brk(){const a=S.active;if(!a)return;if(a.brkStart){a.brkMs=(a.brkMs||0)+Date.now()-a.brkStart;a.brkStart=0}else a.brkStart=Date.now();save();render()},
   stop(){const a=S.active;if(!a)return;if(a.brkStart){a.brkMs=(a.brkMs||0)+Date.now()-a.brkStart;a.brkStart=0}
