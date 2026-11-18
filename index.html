@@ -207,9 +207,10 @@ function vKayit(){
 }
 
 /* ---------- calculators ---------- */
-const C=(id,d)=>S.calc[id]!=null&&S.calc[id]!==''?toN(S.calc[id]):d;
+const C=(id,d)=>S.calc[id]!=null?toN(S.calc[id]):d;
+function resetCalc(c){c.f.forEach(x=>{if(x[3]&&x[3].indexOf('month')>-1)delete S.calc[x[0]];else S.calc[x[0]]=''})}
 function fld(id,label,d,tp){const v=S.calc[id]!=null?S.calc[id]:d;return `<div><label class="lbl">${label}</label><input class="in" ${tp||'inputmode="decimal"'} data-c="${id}" value="${esc(v)}"></div>`}
-function calcForm(c){return `<div class="cd"><div class="g2">${c.f.map(x=>fld(x[0],x[1],x[2],x[3])).join('')}</div></div>${c.note?`<div class="xs mu" style="margin-top:8px">${c.note}</div>`:''}<div id="out">${c.out()}</div>`}
+function calcForm(c){return `<div class="cd"><div class="g2">${c.f.map(x=>fld(x[0],x[1],x[2],x[3])).join('')}</div><button class="btn" style="width:100%;margin-top:10px" data-act="calc-reset"><span class="sv">Sıfırla</span></button></div>${c.note?`<div class="xs mu" style="margin-top:8px">${c.note}</div>`:''}<div id="out">${c.out()}</div>`}
 
 const MODEL={note:'Değerler örnek. Kendi rakamlarınla oyna. "Ciro" Uber\'in şirkete bıraktığı net tutar.',
 f:[['m_h','Saat / ay',173],['m_r','Ciro € / saat',24],['m_w','Saatlik ücret €',13.9],['m_p','Yüzde %',40],['m_b','Taban € / ay',1000],['m_t','Prim eşiği € ciro',3000],['m_bp','Prim % (eşik üstü)',25],['m_oc','İşveren yan gider %',21],['m_car','Araç gideri € / ay',1400]],
@@ -252,7 +253,7 @@ return `<div class="cd gc"><div class="xs mu">Kayıtlı saat (${m})</div><div cl
 <div class="cd"><table class="tbl"><tr><td>Zeitkonto (kayıt − sözleşme)</td><td class="${lh-c>=0?'ok':'bad'}">${lh-c>=0?'+':''}${num(lh-c)} sa</td></tr><tr><td>Ödenmeyen saat (kayıt − bordro)</td><td class="${d1>0.01?'bad':'ok'}">${num(d1)} sa</td></tr><tr><td>Bordro saat × ücret</td><td>${eur(exp)}</td></tr><tr><td>Ödenen − beklenen</td><td class="${pe-exp<-0.5?'bad':'ok'}">${eur(pe-exp)}</td></tr><tr><td>Kayıtlı saat için ödenmesi gereken</td><td>${eur(lh*r)}</td></tr></table></div>`}};
 
 const CALCS={model:['Model',MODEL],minij:['Minijob',MINIJ],firma:['Kendi firma',FIRMA],cagri:['Çağrı',CAGRI],sarj:['Şarj',SARJ]};
-function vHesap(){return `<div class="top"><h1 class="gt">Hesap</h1></div>`+chips(Object.entries(CALCS).map(([k,v])=>[k,v[0]]),sub.hesap,'sub-hesap')+calcForm(CALCS[sub.hesap][1])}
+function vHesap(){return `<div class="top"><h1 class="gt">Hesap</h1><button class="btn" data-act="calc-reset-all"><span class="sv">Hepsini sıfırla</span></button></div>`+chips(Object.entries(CALCS).map(([k,v])=>[k,v[0]]),sub.hesap,'sub-hesap')+calcForm(CALCS[sub.hesap][1])}
 let curCalc=()=>tab==='hesap'?CALCS[sub.hesap][1]:(tab==='kayit'&&sub.kayit==='maas'?MAAS:null);
 
 /* ---------- takvim ---------- */
@@ -474,6 +475,8 @@ const val=id=>{const e=$('#'+id);return e?e.value:''};
 const act={
   tab(d){tab=d.v;ui.restOk=false;render();window.scrollTo(0,0)},
   'sub-kayit'(d){sub.kayit=d.v;render()},'sub-hesap'(d){sub.hesap=d.v;render()},
+  'calc-reset'(){const c=curCalc();if(c){resetCalc(c);save();render()}},
+  'calc-reset-all'(){Object.values(CALCS).forEach(v=>resetCalc(v[1]));resetCalc(MAAS);save();render()},
   city(d){ui.city=d.v;render()},cat(d){ui.cat=d.v;render()},
   start(){const ru=restUntil();if(ru>Date.now()&&!ui.restOk){ui.restOk=true;render();return}S.active={ts:Date.now(),brkMs:0,brkStart:0};ui.restOk=false;save();render()},
   brk(){const a=S.active;if(!a)return;if(a.brkStart){a.brkMs=(a.brkMs||0)+Date.now()-a.brkStart;a.brkStart=0}else a.brkStart=Date.now();save();render()},
