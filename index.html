@@ -158,7 +158,7 @@ function vAna(){
   h+=`<div class="cd"><div class="row"><b>Gün özetini anlat</b><span class="sp"></span>${DICT?`<button class="coin" data-act="mic" aria-label="Konuş">${ic('mic')}</button>`:''}</div>
     <textarea class="in" id="aitxt" placeholder="Örn: bugün 7-15 arası çalıştım, 45 dk mola, ciro 168, bahşiş 12, 140 km, şarj 14 euro" style="margin-top:8px">${esc(ui.aiText)}</textarea>
     <div class="row" style="margin-top:10px"><button class="btn gold s" data-act="aiparse">${ic('wand',16)} Anlat → Kaydet</button><button class="btn s" data-act="newshift">${ic('plus',16)} Elle gir</button></div>
-    <div class="xs mu" style="margin-top:8px">Klavyedeki mikrofonla konuşabilirsin. ${AI?'Yapay zeka anlar.':'Kural tabanlı çalışır: "7\'den 15\'e, ciro 168, bahşiş 12, 140 km, 45 dk mola".'}</div></div>`;
+    <div class="xs mu" style="margin-top:8px">Klavyedeki mikrofonla konuşabilirsin. ${'Kural tabanlı çalışır: "7\'den 15\'e, ciro 168, bahşiş 12, 140 km, 45 dk mola".'}</div></div>`;
   h+=`<div class="cd"><div class="xs mu">Bu ay</div><div class="row" style="margin-top:4px"><b>${num(mm/60)} sa</b><b>${eur(mr,0)}</b><b class="gt">${num(mm>0?mr/(mm/60):0)} €/sa</b></div></div>`;
   h+=`<div class="cd"><b>Yedek</b><div class="xs mu" style="margin-top:2px">Verini kopyala, diğer kopyada yapıştır.</div><div class="row" style="margin-top:10px"><button class="btn gold s" data-act="copybk">${ic('copy',16)} Yedeği kopyala</button><button class="btn s" data-act="pastebk">Yedeği yapıştır</button></div></div>`;
   return h;
@@ -457,14 +457,6 @@ async function aiParse(btn){
   const txt=(ui.aiText||'').trim();if(!txt){toast('Önce anlat veya yaz');return}
   const old=btn.innerHTML;btn.disabled=true;btn.textContent='Anlıyorum...';
   let r=null;
-  if(AI){
-    const prompt=`Bir Uber şoförünün günlük defter asistanısın. Kullanıcı gün özetini Türkçe veya Almanca serbest metinle anlatıyor. SADECE tek bir JSON nesnesi döndür, başka metin yok.
-Bugün: ${today()}, saat dilimi Europe/Berlin.
-Şema: {"type":"shift"|"incident","date":"YYYY-MM-DD","start":"HH:MM","end":"HH:MM","brk":mola dakika,"rev":Uber ciro euro,"tips":bahşiş euro,"cash":nakit euro,"km":km,"charge":şarj veya yakıt gideri euro,"other":diğer gider euro,"title":"olay başlığı","cat":"kaza|hasar|şikayet|ceza|diğer","note":"kısa not"}
-Kurallar: Vardiya anlatılıyorsa type=shift. Kaza, hasar, şikayet, ceza gibi olay ise type=incident. Söylenmeyen alanı null yap, uydurma. Tarih söylenmediyse bugün. "dün" = bir önceki gün. Sayıları sayı olarak ver.
-Kullanıcı metni: """${txt}"""`;
-    try{const x=await AI.json(prompt);if(x&&x.type)r=x}catch(e){r=null}
-  }
   if(!r){try{r=ruleParse(txt)}catch(e){r=null}}
   btn.disabled=false;btn.innerHTML=old;
   if(!r){toast('Anlayamadım, Elle gir');return}
@@ -531,15 +523,7 @@ function render(){
 function loadEvents(){
   try{fetch('events.json?'+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()).then(j=>{if(j&&j.events){EV=j;try{localStorage.setItem(LSE,JSON.stringify(j))}catch(e){}render()}}).catch(()=>{})}catch(e){}
 }
-async function caps(){
-  try{if(window.claude&&claude.use){
-    AI=await claude.use('sample');
-    try{DICT=await claude.use('dictation')}catch(e){}
-    if(DICT){DICT.onFinal(({text})=>{ui.aiText=((ui.aiText||'')+' '+text).trim();const e=$('#aitxt');if(e)e.value=ui.aiText});DICT.onState(({state})=>{ui.listening=state==='listening'})}
-    if(tab==='ana'&&!$('#layer').innerHTML)render();
-  }}catch(e){}
-}
-render();loadEvents();caps();
+render();loadEvents();
 setInterval(()=>{const t=$('#tm');if(t&&S.active)t.textContent=hms(activeMin()*60000)},1000);
 setInterval(()=>{if(tab==='ana'&&!$('#layer').innerHTML&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)))render()},30000);
 try{if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0&&!(window.claude))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
