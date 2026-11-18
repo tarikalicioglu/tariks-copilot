@@ -399,7 +399,8 @@ function ruleParse(text,now){
   const hm=(h,mi)=>P(+h)+':'+P(+(mi||0));
   let s=null,e=null;
   if((m=mk(/(\d{1,2})[:.](\d{2})\s*[-–—]\s*(\d{1,2})[:.](\d{2})/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
-  else if((m=mk(/(\d{1,2})(?::(\d{2}))?\s*(?:den|dan|ten|tan)\s*(\d{1,2})(?::(\d{2}))?\s*(?:e|a|ye|ya|kadar|arası|arasi)?(?![a-zçğıöşü])/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
+  else if((m=mk(/(\d{1,2})(?::(\d{2}))?\s*(?:ila|ile|ve|-|–|—)\s*(?:öğlen|öğle|akşam|aksam|gece|sabah)?\s*(\d{1,2})(?::(\d{2}))?\s*(?:arası|arasi|kadar)/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
+  else if((m=mk(/(\d{1,2})(?::(\d{2}))?\s*(?:den|dan|ten|tan)\s*(?:öğlen|öğle|akşam|aksam|gece)?\s*(\d{1,2})(?::(\d{2}))?\s*(?:e|a|ye|ya|kadar|arası|arasi)?(?![a-zçğıöşü])/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
   else if((m=mk(/(\d{1,2})(?::(\d{2}))?\s*[-–—]\s*(\d{1,2})(?::(\d{2}))?\s*(?:arası|arasi)/))){s=hm(m[1],m[2]);e=hm(m[3],m[4])}
   else if((m=mk(/sabah\s*(?:saat\s*)?(\d{1,2})(?::(\d{2}))?.{0,30}?(?:akşam|aksam|öğleden sonra|ogleden sonra)\s*(?:saat\s*)?(\d{1,2})(?::(\d{2}))?/))){s=hm(m[1],m[2]);e=hm(+m[3]<12?+m[3]+12:m[3],m[4])}
   else{
@@ -412,13 +413,15 @@ function ruleParse(text,now){
   if(s)r.start=s;if(e)r.end=e;
   /* break */
   const U=u=>(u==='saat'||u==='sa')?60:1;
-  if((m=mk(/(\d+(?:\.\d+)?)\s*(dk|dak|dakika|saat|sa)?\s*(?:mola|ara verdim)/)))r.brk=Math.round(+m[1]*U(m[2]));
-  else if((m=mk(/mola[^\d]{0,12}?(\d+(?:\.\d+)?)\s*(dk|dak|dakika|saat|sa)?/)))r.brk=Math.round(+m[1]*U(m[2]));
+  const mv=(v,u)=>u?Math.round(v*U(u)):(v<=3?Math.round(v*60):Math.round(v));
+  if(/mola\s*(?:vermedim|yok|yapmadım)|molasız/.test(t))r.brk=0;
+  else if((m=mk(/(\d+(?:\.\d+)?)\s*(dk|dak|dakika|saat|sa)?\s*(?:mola|ara verdim)/)))r.brk=mv(+m[1],m[2]);
+  else if((m=mk(/mola\s*(?:yaptım|verdim|var|oldu)?\s*[:=]?\s*(\d+(?:\.\d+)?)\s*(dk|dak|dakika|saat|sa)?/)))r.brk=mv(+m[1],m[2]);
   /* km */
   if((m=mk(/(\d+(?:\.\d+)?)\s*(?:km|kilometre|kilometer)/))||(m=mk(/km\s*[:=]?\s*(\d+(?:\.\d+)?)/)))r.km=+m[1];
   /* money */
   const L='(?<![a-zçğıöşü])';
-  const KW={rev:L+'(?:ciro|kazan\\S*|uber|hasılat|gelir)',tips:L+'(?:bahşiş|bahsis|tips?)',cash:L+'(?:nakit|cash|elden)',charge:L+'(?:şarj|sarj|yakıt|akaryakıt|benzin|supercharger)',other:L+'(?:otopark|yıkama|yikama|köprü|otoyol|gider|masraf)'};
+  const KW={rev:L+'(?:ciro|kazan\\S*|uber|hasılat|gelir|toplam)',tips:L+'(?:bahşiş|bahsis|tips?)',cash:L+'(?:nakit|cash|elden)',charge:L+'(?:şarj|sarj|yakıt|akaryakıt|benzin|supercharger)',other:L+'(?:otopark|yıkama|yikama|köprü|otoyol|gider|masraf)'};
   const hits=[];for(const k in KW){const re=new RegExp(KW[k],'g');let x;while((x=re.exec(t)))hits.push({k,pos:x.index,end:x.index+x[0].length})}
   hits.sort((a,b)=>a.pos-b.pos);
   const nums=[];{const re=/\d+(?:\.\d+)?/g;let x;while((x=re.exec(t)))nums.push({v:+x[0],pos:x.index,end:x.index+x[0].length,used:false})}
@@ -427,6 +430,7 @@ function ruleParse(text,now){
   const findAfter=h=>nums.find(n=>!n.used&&n.pos>=h.end&&n.pos-h.end<=18&&!between(h.end,n.pos,h));
   const findBefore=h=>{let c=null;nums.forEach(n=>{if(!n.used&&n.end<=h.pos&&h.pos-n.end<=14&&!between(n.end,h.pos,h))c=n});return c};
   hits.forEach(h=>{if(r[h.k]!=null)return;const n=style==='after'?(findAfter(h)||findBefore(h)):(findBefore(h)||findAfter(h));if(n){n.used=true;r[h.k]=n.v}});
+  if(r.rev==null){const cm=nums.find(n=>!n.used&&/^\s*(?:€|euro|eur|avro)/.test(t.slice(n.end)));if(cm){cm.used=true;r.rev=cm.v}}
   /* incident */
   const inc=/(kaza|çarp\S*|hasar|çizik|göçük|şikayet|sikayet|ceza|radar|polis|arıza)/.exec(t);
   if(inc&&!(r.start&&r.end)&&r.rev==null){
